@@ -20,7 +20,10 @@
     "@angular/platform-server": "^21.2.0",
     "@angular/router": "^21.2.0",
     "@angular/ssr": "^21.2.5",
+    "@genkit-ai/express": "^1.34.0",
+    "@genkit-ai/google-genai": "^1.34.0",
     "express": "^5.1.0",
+    "genkit": "^1.34.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },
@@ -32,6 +35,7 @@
     "@types/node": "^20.17.19",
     "jsdom": "^28.0.0",
     "prettier": "^3.8.1",
+    "tsx": "^4.22.3",
     "typescript": "~5.9.2",
     "vitest": "^4.0.8"
   }
