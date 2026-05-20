@@ -7,7 +7,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:genkit-ssr-example": "node dist/genkit-ssr-example/server/server.mjs"
+    "serve:ssr:genkit-ssr-example": "node dist/genkit-ssr-example/server/server.mjs",
+    "dev:ssr": "node --watch dist/genkit-ssr-example/server/server.mjs"
   },
   "private": true,
   "packageManager": "npm@11.6.2",

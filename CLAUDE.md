@@ -6,12 +6,14 @@ General Angular/TypeScript style rules live in `.claude/CLAUDE.md` — read thos
 
 ## Commands
 
-- `npm start` — dev server on http://localhost:4200 (uses Angular's `@angular/build:dev-server`, which runs the Express+SSR entry from `src/server.ts`, so Genkit endpoints under `/api/*` are available in dev).
-- `npm run build` — production build to `dist/genkit-ssr-example/` (server output mode, so emits both `browser/` and `server/`).
-- `npm run watch` — dev-configuration build with file watching.
-- `npm run serve:ssr:genkit-ssr-example` — run the built SSR server (`node dist/genkit-ssr-example/server/server.mjs`), defaults to `PORT=4000`.
+- `npm run build` — production build to `dist/genkit-ssr-example/` (server output mode, emits both `browser/` and `server/`).
+- `npm run watch` — dev-configuration build with file watching; pairs with `npm run dev:ssr`.
+- `npm run dev:ssr` — run the dist SSR server with `node --watch`, so it restarts automatically when `npm run watch` rewrites `dist/`. Defaults to `PORT=4000`.
+- `npm run serve:ssr:genkit-ssr-example` — same as `dev:ssr` but without the watcher; use for one-off prod-mode runs.
 - `npm test` — Vitest via `@angular/build:unit-test`. Run a single spec with `npx ng test --include src/app/app.spec.ts` (or pass a test name filter through Vitest).
 - Genkit Developer UI: `npx genkit start -- tsx --watch src/genkit/menuSuggestionFlow.ts` (flows are introspectable at the printed local URL; the `.genkit/` directory is the runtime cache for that UI).
+
+`npm start` / `ng serve` is currently broken on this stack: Vite 7's SSR module runner can't resolve `z` through Genkit's `export * from <CJS>` chain, so `src/genkit/*.ts` crashes with `Cannot read properties of undefined (reading 'object')` at startup. The production esbuild path doesn't go through that runner, which is why `npm run build` works. Dev loop is therefore `npm run watch` + `npm run dev:ssr` in two terminals (no HMR; full reload on save). For Genkit flow iteration, prefer the Developer UI command above.
 
 The `GOOGLE_GENAI_API_KEY` (or equivalent Google AI credentials) env var is required at runtime for `menuSuggestionFlow` to call Gemini.
 
