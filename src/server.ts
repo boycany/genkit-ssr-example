@@ -7,10 +7,21 @@ import {
 import express from 'express';
 import { join } from 'node:path';
 
+import { expressHandler } from '@genkit-ai/express';
+import { menuSuggestionFlow } from './genkit/menuSuggestionFlow';
+
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();
+app.use(express.json());
 const angularApp = new AngularNodeAppEngine();
+
+/**
+ *
+ * Genkit Flow
+ *
+ */
+app.post('/api/menuSuggestion', expressHandler(menuSuggestionFlow));
 
 /**
  * Example Express Rest API endpoints can be defined here.
@@ -41,9 +52,7 @@ app.use(
 app.use((req, res, next) => {
   angularApp
     .handle(req)
-    .then((response) =>
-      response ? writeResponseToNodeResponse(response, res) : next(),
-    )
+    .then((response) => (response ? writeResponseToNodeResponse(response, res) : next()))
     .catch(next);
 });
 
