@@ -1,27 +1,86 @@
-<main>
-  <h3>Generate a custom menu item</h3>
-  <label for="theme">Suggest a menu item for a restaurant with this theme: </label>
-  <input type="text" id="theme" [(ngModel)]="menuInput" />
-  <br />
-  <br />
-  <button (click)="streamMenuItem()" [disabled]="isStreaming()">Generate</button>
-  <br />
-  <br />
-  @if (streamedText()) {
-    <div>
-      <h4>Streaming Output:</h4>
-      <pre>{{ streamedText() }}</pre>
-    </div>
-  }
-  @if (isStreaming()) {
-    <div>Streaming...</div>
-  }
-  <!-- @if (menuResource.isLoading()) {
-    <div>Loading...</div>
-  } @else if (menuResource.value()) {
-    <div>
-      <h4>Generated Menu Item:</h4>
-      <pre>{{ menuResource.value().menuItem }}</pre>
-    </div>
-  } -->
+<main class="shell">
+  <header class="header">
+    <span class="eyebrow">AI Menu Generator</span>
+    <h1>Generate a custom menu item</h1>
+    <p>Describe a theme and let AI craft a dish idea for your restaurant.</p>
+  </header>
+
+  <section class="card" aria-labelledby="form-heading">
+    <h2 id="form-heading" class="sr-only">Menu generator form</h2>
+
+    <form class="form" (ngSubmit)="streamMenuItem()">
+      <div class="input-row">
+        <label for="theme" class="sr-only">Restaurant theme</label>
+        <input
+          type="text"
+          id="theme"
+          name="theme"
+          placeholder="e.g. cozy autumn brunch, futuristic ramen bar..."
+          autocomplete="off"
+          [(ngModel)]="menuInput"
+          [disabled]="isStreaming()"
+        />
+        <button type="submit" [disabled]="isStreaming() || !menuInput.trim()">
+          @if (isStreaming()) {
+            <span class="spinner" aria-hidden="true"></span>
+            <span>Generating…</span>
+          } @else {
+            <span>Generate</span>
+          }
+        </button>
+      </div>
+    </form>
+
+    @if (parsedMenu(); as menu) {
+      <article class="menu-card" aria-live="polite">
+        <header class="menu-card__header">
+          @if (isStreaming()) {
+            <span class="live-pill" aria-hidden="true">
+              <span class="live-dot"></span>
+              Streaming
+            </span>
+          }
+          @if (menu.name) {
+            <h3 class="menu-card__name">{{ menu.name }}</h3>
+          }
+          @if (menu.tagline) {
+            <p class="menu-card__tagline">"{{ menu.tagline }}"</p>
+          }
+        </header>
+
+        @if (menu.description) {
+          <p class="menu-card__description">{{ menu.description }}</p>
+        }
+
+        @if (menu.ingredients.length > 0) {
+          <section class="menu-card__section">
+            <h4 class="menu-card__label">Ingredients</h4>
+            <ul class="ingredients">
+              @for (item of menu.ingredients; track item) {
+                <li class="ingredient">
+                  <span class="ingredient__bullet" aria-hidden="true"></span>
+                  <span>{{ item }}</span>
+                </li>
+              }
+            </ul>
+          </section>
+        }
+
+        @if (menu.pairing) {
+          <footer class="menu-card__pairing">
+            <span class="menu-card__pairing-icon" aria-hidden="true">🥂</span>
+            <div>
+              <span class="menu-card__label">Pairs with</span>
+              <p>{{ menu.pairing }}</p>
+            </div>
+          </footer>
+        }
+      </article>
+    } @else if (isStreaming()) {
+      <p class="status" role="status">
+        <span class="spinner" aria-hidden="true"></span>
+        <span>Crafting your dish…</span>
+      </p>
+    }
+  </section>
 </main>

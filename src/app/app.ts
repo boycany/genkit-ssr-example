@@ -1,6 +1,17 @@
-import { Component, signal } from '@angular/core';
+import { Component, computed, signal } from '@angular/core';
 import { streamFlow } from 'genkit/beta/client';
 import { FormsModule } from '@angular/forms';
+
+interface ParsedMenu {
+  name: string;
+  tagline: string;
+  description: string;
+  ingredients: string[];
+  pairing: string;
+}
+
+const SECTION_RE =
+  /^(NAME|TAGLINE|DESCRIPTION|INGREDIENTS|PAIRING):\s*([\s\S]*?)(?=^(?:NAME|TAGLINE|DESCRIPTION|INGREDIENTS|PAIRING):|$(?![\s\S]))/gm;
 
 @Component({
   selector: 'app-root',
@@ -14,6 +25,39 @@ export class App {
   menuInput = '';
   streamedText = signal('');
   isStreaming = signal(false);
+
+  parsedMenu = computed<ParsedMenu | null>(() => {
+    const text = this.streamedText();
+    if (!text) return null;
+
+    const sections: Record<string, string> = {};
+    SECTION_RE.lastIndex = 0;
+    let match: RegExpExecArray | null;
+    while ((match = SECTION_RE.exec(text)) !== null) {
+      sections[match[1]] = match[2].trim();
+    }
+
+    const ingredients = (sections['INGREDIENTS'] ?? '')
+      .split('\n')
+      .map((line) => line.replace(/^[-*•]\s*/, '').trim())
+      .filter(Boolean);
+
+    const parsed: ParsedMenu = {
+      name: sections['NAME'] ?? '',
+      tagline: sections['TAGLINE'] ?? '',
+      description: sections['DESCRIPTION'] ?? '',
+      ingredients,
+      pairing: sections['PAIRING'] ?? '',
+    };
+
+    const hasAnything =
+      parsed.name ||
+      parsed.tagline ||
+      parsed.description ||
+      parsed.ingredients.length > 0 ||
+      parsed.pairing;
+    return hasAnything ? parsed : null;
+  });
 
   async streamMenuItem() {
     const theme = this.menuInput;
