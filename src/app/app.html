@@ -2,16 +2,26 @@
   <h3>Generate a custom menu item</h3>
   <label for="theme">Suggest a menu item for a restaurant with this theme: </label>
   <input type="text" id="theme" [(ngModel)]="menuInput" />
-  <button (click)="theme.set(menuInput)">Generate</button>
   <br />
   <br />
-  @if (menuResource.isLoading()) {
+  <button (click)="streamMenuItem()" [disabled]="isStreaming()">Generate</button>
+  <br />
+  <br />
+  @if (streamedText()) {
+    <div>
+      <h4>Streaming Output:</h4>
+      <pre>{{ streamedText() }}</pre>
+    </div>
+  }
+  @if (isStreaming()) {
+    <div>Streaming...</div>
+  }
+  <!-- @if (menuResource.isLoading()) {
     <div>Loading...</div>
   } @else if (menuResource.value()) {
     <div>
       <h4>Generated Menu Item:</h4>
       <pre>{{ menuResource.value().menuItem }}</pre>
     </div>
-  }
+  } -->
 </main>
-<router-outlet />
